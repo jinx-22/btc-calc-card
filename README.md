@@ -47,6 +47,11 @@ Type an amount into any field and all other fields are calculated at once: how m
 - Visual Home Assistant editor
 - English and German (follows the HA language)
 
+> [!TIP]
+> ## Need price sensors?
+> Use your own self-hosted Mempool instance with the **[Mempool Watch](https://github.com/jinx-22/mempool_watch)** integration.  
+> It creates BTC price entities in multiple currencies – completely local.
+
 ---
 
 # 📦 Installation
