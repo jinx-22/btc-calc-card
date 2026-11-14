@@ -8,6 +8,11 @@
 
 **BTC Calc Card** is a Home Assistant custom card that converts between Bitcoin, sats and any number of fiat currencies using your own price sensors – and calculates the spread of a Bitcoin offer.
 
+> [!TIP]
+> ## Why use this card?
+> Many online BTC calculators send your IP address and data to third-party servers with every input.
+> This card runs completely locally on your own Home Assistant – nothing leaves your network!!!
+
 **Current version: 0.4.6**
 
 See the [CHANGELOG](CHANGELOG.md) for the history.
