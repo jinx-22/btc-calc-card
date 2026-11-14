@@ -53,6 +53,11 @@ Gib in einem beliebigen Feld einen Betrag ein, und alle anderen Felder werden so
 - Visueller Home-Assistant-Editor
 - Deutsch und Englisch (folgt der HA-Sprache)
 
+> [!TIP]
+> ## Brauchst du eine BTC-Preis-Entität?
+> Du kannst deine eigene selbst gehostete [Mempool](https://github.com/mempool/mempool)-Instanz zusammen mit der **[Mempool Watch](https://github.com/jinx-22/mempool_watch)**-Integration nutzen.  
+> Sie liefert saubere BTC-Preis-Sensoren in mehreren Fiat-Währungen – vollständig lokal und datenschutzfreundlich.
+
 ---
 
 # 📦 Installation
