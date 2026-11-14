@@ -1,4 +1,5 @@
 /* btc-calc-card v0.4.6 – Bitcoin/sats calculator with spread for Home Assistant (EN/DE) */
+const VERSION = '0.4.6';
 const SATS = 1e8;
 const DEMO = { EUR: 90000, USD: 100000 };
 const SYM = { EUR: '€', USD: '$', GBP: '£', CHF: 'CHF', JPY: '¥' };
@@ -10,7 +11,7 @@ const TR = {
     hint_check: 'Enter both values: the amount you receive and the purchase amount.', hint_calc: 'Enter both values: the purchase amount and the premium (negative = discount).',
     offer: 'Calculate offer', check: 'Check spread', calc: 'Calculate sats', amount: 'Amount', buy: 'Purchase amount', prem: 'Premium / discount',
     offer_price: 'Offer price', market_price: 'Market price', prem_cur: (s) => `Premium in ${s}`, disc_cur: (s) => `Discount in ${s}`,
-    receive: 'You receive', in_btc: 'In BTC', prem_sats: 'Premium in sats', disc_sats: 'Discount in sats', prem_pct: 'Premium in %', disc_pct: 'Discount in %', fair: 'Sats at market price',
+    receive: 'You receive', prem_sats: 'Premium in sats', disc_sats: 'Discount in sats', prem_pct: 'Premium in %', disc_pct: 'Discount in %', fair: 'Sats at market price',
     desc: 'Bitcoin/sats calculator with any number of currencies and an optional spread calculator',
     title: 'Title', show_spread: 'Show offer calculator (spread)', entity: 'Price entity (price for 1 BTC)', code: 'Code (e.g. EUR)', symbol: 'Symbol (e.g. €)', active: 'Active',
     currencies: 'Currencies', add: 'Add currency', cur_n: (n) => `Currency ${n}`, remove: 'Remove', move_up: 'Move up', move_down: 'Move down',
@@ -21,7 +22,7 @@ const TR = {
     hint_check: 'Beide Beträge eingeben: Menge und Kaufbetrag.', hint_calc: 'Beide Werte eingeben: Kaufbetrag und Aufschlag (negativ = Nachlass).',
     offer: 'Angebot berechnen', check: 'Spread prüfen', calc: 'Sats berechnen', amount: 'Menge', buy: 'Kaufbetrag', prem: 'Aufschlag / Nachlass',
     offer_price: 'Angebotspreis', market_price: 'Marktpreis', prem_cur: (s) => `Aufschlag in ${s}`, disc_cur: (s) => `Abschlag in ${s}`,
-    receive: 'Du erhältst', in_btc: 'In BTC', prem_sats: 'Aufschlag in Sats', disc_sats: 'Abschlag in Sats', prem_pct: 'Aufschlag in %', disc_pct: 'Abschlag in %', fair: 'Sats zum Marktpreis',
+    receive: 'Du erhältst', prem_sats: 'Aufschlag in Sats', disc_sats: 'Abschlag in Sats', prem_pct: 'Aufschlag in %', disc_pct: 'Abschlag in %', fair: 'Sats zum Marktpreis',
     desc: 'Bitcoin-/Sats-Rechner mit beliebig vielen Währungen und optionalem Spread-Rechner',
     title: 'Titel', show_spread: 'Angebot berechnen (Spread) anzeigen', entity: 'Preis-Entität (Preis für 1 BTC)', code: 'Kürzel (z. B. EUR)', symbol: 'Symbol (z. B. €)', active: 'Aktiv',
     currencies: 'Währungen', add: 'Währung hinzufügen', cur_n: (n) => `Währung ${n}`, remove: 'Entfernen', move_up: 'Nach oben', move_down: 'Nach unten',
@@ -82,12 +83,18 @@ class BtcCalcCard extends HTMLElement {
 
   setConfig(config) {
     if (!config) throw new Error('Invalid configuration');
-    this._config = { show_spread: false, ...config, currencies: (config.currencies || []).map((c) => ({ ...c })) };
+    this._config = { show_spread: false, ...config, currencies: (Array.isArray(config.currencies) ? config.currencies : []).map((c) => ({ ...c })) };
     this._sig = null;
     this._refresh();
   }
 
-  set hass(h) { this._hass = h; this._refresh(); }
+  set hass(h) {
+    const o = this._hass;
+    this._hass = h;
+    if (o && this._config && o.language === h.language && o.locale?.language === h.locale?.language
+      && this._config.currencies.every((c) => !c?.entity || o.states?.[c.entity] === h.states?.[c.entity])) return;
+    this._refresh();
+  }
 
   getCardSize() {
     const est = this._config?.show_spread ? 17 : 10;
@@ -156,8 +163,10 @@ class BtcCalcCard extends HTMLElement {
     this._update();
   }
 
-  _fmt(n, d) { return new Intl.NumberFormat(this._loc, { minimumFractionDigits: d, maximumFractionDigits: d }).format(n); }
-  _plain(n, d) { return n.toFixed(d).replace('.', this._dec); }
+  _fmt(n, d) {
+    const k = this._loc + '|' + d, c = this._nfc || (this._nfc = {});
+    return (c[k] || (c[k] = new Intl.NumberFormat(this._loc, { minimumFractionDigits: d, maximumFractionDigits: d }))).format(n);
+  }
   _btc(x) { return x.toFixed(8).replace(/0+$/, '').replace(/\.$/, '').replace('.', this._dec); }
   _sg(n, d) { return (n > 0 ? '+' : n < 0 ? '−' : '') + this._fmt(Math.abs(n), d); }
   _gf(d) {
@@ -215,10 +224,10 @@ class BtcCalcCard extends HTMLElement {
         <label class="f">Bitcoin<span class="b"><input data-k="sats" inputmode="${mu === 'btc' ? 'decimal' : 'numeric'}" autocomplete="off" placeholder="0"><select data-u="main"><option value="sats"${mu === 'sats' ? ' selected' : ''}>sats</option><option value="btc"${mu === 'btc' ? ' selected' : ''}>BTC</option></select></span><span class="n" data-btc></span></label>
       </div>
       <div class="fs">
-        ${act.map((x, i) => `<label class="f">${esc(x.code || x.sym)}<span class="b"><input data-k="${esc(x.key)}" inputmode="decimal" autocomplete="off" placeholder="0"><span class="u">${esc(x.sym)}</span></span><span class="n"></span></label>`).join('')}
+        ${act.map((x) => `<label class="f">${esc(x.code || x.sym)}<span class="b"><input data-k="${esc(x.key)}" inputmode="decimal" autocomplete="off" placeholder="0"><span class="u">${esc(x.sym)}</span></span><span class="n"></span></label>`).join('')}
       </div>
       ${c.show_spread ? `<div class="sp">
-        <div class="sh"><span>${esc(this._t('offer'))}</span><select class="cs" data-s="cur">${act.map((x, i) => `<option value="${esc(x.key)}">${esc(x.code || x.sym)}</option>`).join('')}</select></div>
+        <div class="sh"><span>${esc(this._t('offer'))}</span><select class="cs" data-s="cur">${act.map((x) => `<option value="${esc(x.key)}">${esc(x.code || x.sym)}</option>`).join('')}</select></div>
         <div class="seg"><button type="button" data-m="check">${esc(this._t('check'))}</button><button type="button" data-m="calc">${esc(this._t('calc'))}</button></div>
         <div class="fs sf"></div><div class="hint sn"></div><div class="rs"></div></div>` : ''}`
       : `<div class="hint">${esc(this._t('none'))}</div>`;
@@ -316,9 +325,9 @@ class BtcCalcCard extends HTMLElement {
     }
     const prem = (offer / price - 1) * 100, dS = fair - got, dC = amt - (got / SATS) * price;
     const d = prem < 0, cls = prem > 0 ? 'pos' : prem < 0 ? 'neg' : '';
-    rs.innerHTML = row(t(d ? 'disc_pct' : 'prem_pct'), `${this._sg(prem, 2)} %`, cls, ' m')
-      + row(t(d ? 'disc_cur' : 'prem_cur', sym), `${this._sg(dC, 2)} ${sym}`, cls, ' m')
-      + row(t(d ? 'disc_sats' : 'prem_sats'), `${this._sg(dS, 0)} sats`, cls, ' m e')
+    rs.innerHTML = row(t(d ? 'disc_pct' : 'prem_pct'), `${this._sg(prem, 2)} %`, cls)
+      + row(t(d ? 'disc_cur' : 'prem_cur', sym), `${this._sg(dC, 2)} ${sym}`, cls)
+      + row(t(d ? 'disc_sats' : 'prem_sats'), `${this._sg(dS, 0)} sats`, cls, ' e')
       + row(t('receive'), `${this._fmt(got, 0)} sats`, '', '', `${this._fmt(got / SATS, 8)} BTC`)
       + row(t('fair'), `${this._fmt(fair, 0)} sats`)
       + row(t('offer_price'), `${this._fmt(offer, 2)} ${sym} / BTC`)
@@ -388,7 +397,7 @@ const EDITOR_STYLE = `.ed .h{font-weight:600;margin:16px 0 8px}.ed .row{border:1
 
 class BtcCalcCardEditor extends HTMLElement {
   setConfig(config) {
-    this._config = { ...config, currencies: (config.currencies || []).map((c) => ({ ...c })) };
+    this._config = { ...config, currencies: (Array.isArray(config.currencies) ? config.currencies : []).map((c) => ({ ...c })) };
     if (!this._built) this._build();
     this._sync();
   }
@@ -485,13 +494,13 @@ class BtcCalcCardEditor extends HTMLElement {
   }
 }
 
-customElements.define('btc-calc-card', BtcCalcCard);
-customElements.define('btc-calc-card-editor', BtcCalcCardEditor);
+if (!customElements.get('btc-calc-card')) customElements.define('btc-calc-card', BtcCalcCard);
+if (!customElements.get('btc-calc-card-editor')) customElements.define('btc-calc-card-editor', BtcCalcCardEditor);
 window.customCards = window.customCards || [];
-window.customCards.push({
+if (!window.customCards.some((c) => c.type === 'btc-calc-card')) window.customCards.push({
   type: 'btc-calc-card',
   name: 'BTC Calc Card',
   preview: true,
   get description() { return tr(langOf(document.querySelector('home-assistant')?.hass), 'desc'); },
 });
-console.info('%c BTC-CALC-CARD %c v0.4.6 ', 'background:#f7931a;color:#000;font-weight:700', 'background:#333;color:#fff');
+console.info(`%c BTC-CALC-CARD %c v${VERSION} `, 'background:#f7931a;color:#000;font-weight:700', 'background:#333;color:#fff');
