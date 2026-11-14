@@ -8,13 +8,25 @@
 
 **BTC Calc Card** ist eine Home-Assistant-Karte, die mit deinen eigenen Preis-Sensoren zwischen Bitcoin, Sats und beliebig vielen Währungen umrechnet – und den Spread eines Bitcoin-Angebots berechnet.
 
+
+> [!TIP]
+> ## Warum nutze ich diese Karte?
+> Viele Online-BTC-Rechner senden bei jeder Eingabe deine IP-Adresse und Daten an fremde Server.
+> Diese Karte läuft komplett lokal auf deinem eigenen Home Assistant – nichts verlässt dein Netzwerk!!!
+
 **Aktuelle Version: 0.4.6**
 
 Den Verlauf findest du im [CHANGELOG](CHANGELOG.md).
 
-Screenshot mit 4 Währungen und aktiviertem Spread-Rechner:
-<br>
-<img width="40%" height="auto" alt="preview-de" src="images/preview-de.png" />
+## Screenshots
+
+<table> <tr> <td width="50%" valign="top"> Screenshot mit einer FIAT-Währung:<br> <img width="100%" alt="preview-usd-de" src="https://github.com/user-attachments/assets/f2322cc0-e97e-4df6-86ff-3e0e96865a45" />
+ <br><br> Screenshot mit einer FIAT-Währung und eingeschalteten Spread-Rechner:<br> <img width="100%" alt="preview-usd-spread-de" src="https://github.com/user-attachments/assets/2ec2ed0a-5af3-4531-8dff-4a033855f8a6" />
+ </td> <td width="50%" valign="top"> Screenshot mit 4 FIAT-Währungen und eingeschalteten Spread-Rechnerr:<br> <img width="100%" alt="preview-de" src="https://github.com/user-attachments/assets/964ad3b3-2390-4373-bcc2-2becf47bf4dc" />
+
+ </td> </tr> </table>
+
+Die Screenshots zeigen Beispiel-Werte!
 
 ---
 
@@ -154,11 +166,13 @@ Beide Modi zeigen dieselben Ergebnisse in derselben Reihenfolge:
 
 # 📸 Screenshot
 
-Screenshot mit 4 Währungen und aktiviertem Spread-Rechner:
-<br>
-<img width="40%" height="auto" alt="preview-de" src="images/preview-de.png" />
+<table> <tr> <td width="50%" valign="top"> Screenshot mit einer FIAT-Währung:<br> <img width="100%" alt="preview-usd-de" src="https://github.com/user-attachments/assets/f2322cc0-e97e-4df6-86ff-3e0e96865a45" />
+ <br><br> Screenshot mit einer FIAT-Währung und eingeschalteten Spread-Rechner:<br> <img width="100%" alt="preview-usd-spread-de" src="https://github.com/user-attachments/assets/2ec2ed0a-5af3-4531-8dff-4a033855f8a6" />
+ </td> <td width="50%" valign="top"> Screenshot mit 4 FIAT-Währungen und eingeschalteten Spread-Rechnerr:<br> <img width="100%" alt="preview-de" src="https://github.com/user-attachments/assets/964ad3b3-2390-4373-bcc2-2becf47bf4dc" />
 
-Der Screenshot zeigt Beispielpreise.
+ </td> </tr> </table>
+
+Die Screenshots zeigen Beispiel-Werte!
 
 ---
 
