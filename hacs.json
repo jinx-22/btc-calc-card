@@ -1,5 +1,6 @@
 {
   "name": "BTC Calc Card",
   "render_readme": true,
+  "homeassistant": "2026.08.0",
   "filename": "btc-calc-card.js"
 }
